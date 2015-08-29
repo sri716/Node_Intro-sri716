@@ -18,7 +18,8 @@ NOTES: 		1) All the properties of the contact (firstName, lastName, phone) can h
 			   need to think of how read contact(s) will be implemented as well to ensure both Add/Read will work.
 */
 exports.AddContact = function(filename, contact){
-
+	if(contact)
+		fs.appendFileSync(filename,JSON.stringify(contact)+"*");
 }
 
 /*
@@ -33,7 +34,12 @@ NOTES: 		1) All the properties of the contact (firstName, lastName, phone) can h
 */
 
 exports.ReadContacts = function(filename){
-
+	var contacts = fs.readFileSync(filename,"utf-8");
+	contacts = contacts.split('*');
+	contacts.pop();
+	for( var index=0; index< contacts.length; index++)
+		contacts[index] = JSON.parse(contacts[index]);
+	return contacts;
 }
 
 /*
@@ -50,7 +56,19 @@ NOTES: 		You need to only come up with a functionally correct solution and it do
 
 */
 exports.UpdateContact = function(filename, contactname, newPhoneNumber){
-
+	var contacts = fs.readFileSync(filename,"utf-8");
+	contacts = contacts.split('*');
+	contacts.pop();
+	for( var index=0; index< contacts.length; index++){
+		contacts[index] = JSON.parse(contacts[index]);
+		if(contacts[index].firstName === contactname)
+			contacts[index].phone = newPhoneNumber;
+		contacts[index] = JSON.stringify(contacts[index]);
+	}
+	var contacts_str = "";
+	for(var index=0;index<contacts.length; index++)
+		contacts_str = contacts_str + contacts[index] + "*";
+	fs.writeFileSync(filename,contacts_str);
 }
 
 /*
@@ -66,6 +84,20 @@ NOTES: 		You need to only come up with a functionally correct solution and it do
 
 */
 exports.DeleteContact = function(filename, contactname){
-
+	var contacts = fs.readFileSync(filename,"utf-8");
+	contacts = contacts.split('*');
+	contacts.pop();
+	for( var index=0; index< contacts.length; index++){
+		contacts[index] = JSON.parse(contacts[index]);
+		if(contacts[index].firstName === contactname){
+			contacts.splice(index,1);
+			continue;
+		}
+		contacts[index] = JSON.stringify(contacts[index]);
+	}
+	var contacts_str = "";
+	for(var index=0;index<contacts.length; index++)
+		contacts_str = contacts_str + contacts[index] + "*";
+	fs.writeFileSync(filename,contacts_str);
 }
 
